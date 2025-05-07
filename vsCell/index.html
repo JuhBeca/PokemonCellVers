@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pokémon Fire Red Battle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #222;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        /* Telas do jogo */
+        .screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #1a1a2e;
+            transition: opacity 0.5s;
+        }
+
+        /* Tela de cadastro */
+        #registration-screen {
+            z-index: 10;
+            background-image: url('https://lh3.googleusercontent.com/proxy/JHF5NmUy1pOBliV0G3L-a7XPxdy0IcqEscS4CS5WQY7LIrGnJd5DtiMBTSp2UOTdkyUZ9SIalt0HcDkwid7pGti2TtNYBZ66YTk');
+            background-size: cover;
+            background-position: center;
+        }
+
+        #registration-form {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 4px solid #f8d030;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        #registration-form h1 {
+            color: #f8d030;
+            text-shadow: 2px 2px 4px #000;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        #player-name {
+            padding: 12px;
+            font-size: 16px;
+            margin: 10px 0;
+            width: 100%;
+            border: 2px solid #f8d030;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        #register-button {
+            padding: 12px 25px;
+            background-color: #f8d030;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        #register-button:hover {
+            background-color: #f0c000;
+            transform: scale(1.05);
+        }
+
+        /* Tela inicial */
+        #start-screen {
+            z-index: 5;
+            background-image: url('https://imgcdn.stablediffusionweb.com/2024/11/7/44067ec2-05cd-4165-b5bd-f313140318e7.jpg');
+            background-size: cover;
+            background-position: center;
+            display: none;
+        }
+
+        #start-content {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 4px solid #f8d030;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        #welcome-message {
+            color: #f8d030;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        #start-button {
+            padding: 12px 25px;
+            background-color: #f8d030;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        #start-button:hover {
+            background-color: #f0c000;
+            transform: scale(1.05);
+        }
+
+        /* Tela de jogo */
+        #game-screen {
+            display: none;
+            z-index: 2;
+            background-image: url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/2fb2821a-1406-4a1d-9b04-6668f278e944/d843okx-eb13e8e4-0fa4-4fa9-968a-e0f36ff168de.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzJmYjI4MjFhLTE0MDYtNGExZC05YjA0LTY2NjhmMjc4ZTk0NFwvZDg0M29reC1lYjEzZThlNC0wZmE0LTRmYTktOTY4YS1lMGYzNmZmMTY4ZGUucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.TIK_E5L8dTyBUk_dADA5WkLP8jSJMR7YGJG54KNAido');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        #game-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Elementos do jogo */
+        #player-pokemon {
+            position: absolute;
+            bottom: 30%;
+            left: 10px;
+            width: 120px;
+            height: 120px;
+            background-image: url('https://art.pixilart.com/7b2d1341e20f674.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 2;
+        }
+
+        #enemy-pokemon {
+            position: absolute;
+            top: 10%;
+            right: 10px;
+            width: 180px;
+            height: 180px;
+            background-image: url('https://art.pixilart.com/d98f2a9731fa8d9.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 2;
+        }
+
+        .health-bar-container {
+            position: absolute;
+            height: 12px;
+            background-color: #444;
+            border: 2px solid #000;
+            border-radius: 5px;
+            z-index: 3;
+        }
+
+        .health-bar {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 100%;
+            transition: width 0.5s;
+            border-radius: 3px;
+        }
+
+        #player-health-bar-container {
+            bottom: 45%;
+            left: 10px;
+            width: 120px;
+        }
+
+        #enemy-health-bar-container {
+            top: 8%;
+            right: 10px;
+            width: 150px;
+        }
+
+        .health-text {
+            position: absolute;
+            font-size: 12px;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            z-index: 4;
+        }
+
+        #player-health-text {
+            bottom: 47%;
+            left: 10px;
+        }
+
+        #enemy-health-text {
+            top: 5%;
+            right: 10px;
+        }
+
+        #player-name-display {
+            position: absolute;
+            bottom: 49%;
+            left: 10px;
+            font-size: 14px;
+            color: #f8d030;
+            text-shadow: 1px 1px 2px black;
+            z-index: 3;
+        }
+
+        #enemy-name-display {
+            position: absolute;
+            top: 2%;
+            right: 10px;
+            font-size: 14px;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            z-index: 3;
+        }
+
+        #attack-options {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            border-top: 4px solid #f8d030;
+            padding: 10px;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #attack-options h3 {
+            color: #f8d030;
+            margin-bottom: 10px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .attack-buttons-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+            gap: 8px;
+        }
+
+        .attack-button {
+            padding: 12px;
+            background-color: #f8d030;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+        }
+
+        .attack-button:hover {
+            background-color: #f0c000;
+            transform: scale(1.05);
+        }
+
+        /* Tela de perguntas */
+        #question-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 3px solid #f8d030;
+            width: 90%;
+            max-width: 350px;
+            z-index: 10;
+            display: none;
+        }
+
+        #question-text {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .answer-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #333;
+            color: white;
+            border: 1px solid #f8d030;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .answer-button:hover {
+            background-color: #444;
+        }
+
+        /* Display de ataque */
+        #attack-display {
+            position: absolute;
+            bottom: 35%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.466);
+            z-index: 5;
+            display: none;
+            padding: 10px;
+        }
+
+        .pikachu-attack {
+            color: #f8d030;
+        }
+
+        .arceus-attack {
+            color: purple;
+        }
+
+        /* Tela de fim de jogo */
+        #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.pinimg.com/originals/ca/23/6a/ca236ac516a2e51fdc1c4bc09e4139ee.jpg');
+            z-index: 10;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #game-over-content {
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            border: 4px solid #f8d030;
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+        }
+
+        #game-over-text {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        #final-score {
+            font-size: 16px;
+            color: #f8d030;
+            margin-bottom: 15px;
+        }
+
+        #high-scores {
+            margin: 15px 0;
+            width: 100%;
+        }
+
+        #high-scores h2 {
+            color: #f8d030;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        #high-scores-list {
+            list-style-type: none;
+            padding: 0;
+            font-size: 14px;
+        }
+
+        #high-scores-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid #333;
+            color: white;
+        }
+
+        .game-over-button {
+            padding: 10px 20px;
+            margin: 8px;
+            background-color: #f8d030;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .game-over-button:hover {
+            background-color: #f0c000;
+            transform: scale(1.05);
+        }
+
+        /* Adicionando feedback de toque para botões */
+        button {
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+
+        /* Ajustes para telas maiores (modo paisagem) */
+        @media (orientation: landscape) {
+            #player-pokemon {
+                width: 150px;
+                height: 150px;
+                bottom: 25%;
+            }
+            
+            #enemy-pokemon {
+                width: 200px;
+                height: 200px;
+                top: 5%;
+            }
+            
+            #player-health-bar-container {
+                width: 150px;
+                bottom: 35%;
+            }
+            
+            #enemy-health-bar-container {
+                width: 200px;
+            }
+            
+            #attack-options {
+                padding: 5px;
+            }
+            
+            .attack-buttons-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .attack-button {
+                width: 45%;
+                padding: 8px;
+                font-size: 12px;
+            }
+            
+            #attack-display {
+                bottom: 30%;
+            }
+        }
+
+        /* Ajustes para tablets e telas maiores */
+        @media (min-width: 768px) {
+            #player-pokemon {
+                width: 180px;
+                height: 180px;
+            }
+            
+            #enemy-pokemon {
+                width: 250px;
+                height: 250px;
+            }
+            
+            #player-health-bar-container {
+                width: 180px;
+            }
+            
+            #enemy-health-bar-container {
+                width: 250px;
+            }
+            
+            .attack-button {
+                font-size: 16px;
+                padding: 12px;
+            }
+            
+            #question-screen {
+                max-width: 500px;
+            }
+            
+            #game-over-content {
+                max-width: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Tela de cadastro -->
+    <div id="registration-screen" class="screen">
+        <div id="registration-form">
+            <h1>Pokémon Fire Red Battle</h1>
+            <p>Nomeie seu Pikachu!</p>
+            <input type="text" id="player-name" placeholder="Digite o nome do seu Pikachu">
+            <button id="register-button">Registrar</button>
+        </div>
+    </div>
+
+    <!-- Tela inicial -->
+    <div id="start-screen" class="screen">
+        <div id="start-content">
+            <div id="welcome-message"></div>
+            <button id="start-button">Iniciar Batalha</button>
+        </div>
+    </div>
+
+    <!-- Tela de jogo -->
+    <div id="game-screen" class="screen">
+        <div id="game-container">
+            
+            <div id="player-name-display"></div>
+            <div id="enemy-name-display">Arceus</div>
+            
+            <div id="player-health-bar-container" class="health-bar-container">
+                <div id="player-health-bar" class="health-bar"></div>
+            </div>
+            <div id="player-health-text" class="health-text">1000/1000</div>
+            
+            <div id="enemy-health-bar-container" class="health-bar-container">
+                <div id="enemy-health-bar" class="health-bar"></div>
+            </div>
+            <div id="enemy-health-text" class="health-text">5000/5000</div>
+            
+            <div id="player-pokemon"></div>
+            <div id="enemy-pokemon"></div>
+            
+            <div id="attack-options">
+                <h3>Ataques do Pikachu:</h3>
+                <div class="attack-buttons-container">
+                    <button class="attack-button" data-attack="fast" data-damage="100">Ataque Rápido! (100) Fácil</button>
+                    <button class="attack-button" data-attack="discharge" data-damage="250">Descarga! (250) Médio</button>
+                    <button class="attack-button" data-attack="thunder" data-damage="500">Choque do Trovão! (500) Difícil</button>
+                </div>
+            </div>
+            
+            <!-- Tela de perguntas -->
+            <div id="question-screen">
+                <div id="question-text"></div>
+                <div id="answer-options"></div>
+            </div>
+            
+            <!-- Display de ataque -->
+            <div id="attack-display"></div>
+        </div>
+    </div>
+
+    <!-- Tela de fim de jogo -->
+    <div id="game-over-screen" class="screen">
+        <div id="game-over-content">
+            <div id="game-over-text"></div>
+            <div id="final-score"></div>
+            
+            <div id="high-scores">
+                <h2>Melhores Pontuações</h2>
+                <ul id="high-scores-list"></ul>
+            </div>
+            
+            <button id="restart-button" class="game-over-button">Jogar Novamente</button>
+            <button id="clear-scores-button" class="game-over-button">Limpar Placar</button>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis do jogo
+        let playerHealth = 1000;
+        let enemyHealth = 5000;
+        let score = 0;
+        let playerName = "";
+        let currentAttackType = "";
+        let currentAttackDamage = 0;
+        
+        // Elementos do DOM
+        const registrationScreen = document.getElementById('registration-screen');
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const welcomeMessage = document.getElementById('welcome-message');
+        
+        // Perguntas
+        const easyQuestions = [
+            {
+                question: "Qual a probabilidade de sair cara ao lançar uma moeda?",
+                answers: ["25%", "50%", "75%", "100%"],
+                correct: 1
+            },
+            {
+                question: "Qual a chance de rolar um 6 em um dado de 6 lados?",
+                answers: ["1/2", "1/3", "1/6", "1/10"],
+                correct: 2
+            },
+            {
+                question: "Se você tem 4 cartas de um baralho (52 cartas), qual a chance de pegar um Ás?",
+                answers: ["1/13", "1/26", "1/52", "4/52"],
+                correct: 3
+            }
+        ];
+        
+        const mediumQuestions = [
+            {
+                question: "Qual a probabilidade de obter duas caras em dois lançamentos de moeda?",
+                answers: ["25%", "50%", "75%", "100%"],
+                correct: 0
+            },
+            {
+                question: "Qual a chance de rolar um número par em um dado de 6 lados?",
+                answers: ["1/6", "1/3", "1/2", "2/3"],
+                correct: 2
+            },
+            {
+                question: "Em um baralho de 52 cartas, qual a probabilidade de tirar um rei ou uma carta de copas?",
+                answers: ["4/52", "13/52", "16/52", "17/52"],
+                correct: 3
+            }
+        ];
+        
+        const hardQuestions = [
+            {
+                question: "Qual a probabilidade de obter pelo menos uma cara em dois lançamentos de moeda?",
+                answers: ["25%", "50%", "75%", "100%"],
+                correct: 2
+            },
+            {
+                question: "Se você lançar dois dados, qual a probabilidade da soma ser 7?",
+                answers: ["1/6", "1/12", "1/36", "6/36"],
+                correct: 0
+            },
+            {
+                question: "Em um grupo de 23 pessoas, qual a probabilidade aproximada de duas terem a mesma data de aniversário?",
+                answers: ["23%", "50%", "70%", "90%"],
+                correct: 1
+            }
+        ];
+        
+        // Inicialização do jogo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Evento do botão de registro
+            document.getElementById('register-button').addEventListener('click', registerPlayer);
+            document.getElementById('player-name').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    registerPlayer();
+                }
+            });
+            
+            // Evento do botão de iniciar jogo
+            document.getElementById('start-button').addEventListener('click', startGame);
+            
+            // Eventos dos botões de ataque
+            const attackButtons = document.querySelectorAll('.attack-button');
+            attackButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    currentAttackType = this.getAttribute('data-attack');
+                    currentAttackDamage = parseInt(this.getAttribute('data-damage'));
+                    showQuestion(currentAttackType);
+                });
+            });
+            
+            // Evento do botão de reiniciar
+            document.getElementById('restart-button').addEventListener('click', restartGame);
+            
+            // Evento do botão de limpar placar
+            document.getElementById('clear-scores-button').addEventListener('click', clearHighScores);
+            
+            // Carrega o placar
+            loadHighScores();
+        });
+        
+        function registerPlayer() {
+            playerName = document.getElementById('player-name').value.trim();
+            if (playerName === "") {
+                alert("Por favor, nomeie seu Pikachu!");
+                return;
+            }
+            
+            // Mostra tela inicial
+            registrationScreen.style.opacity = '0';
+            setTimeout(() => {
+                registrationScreen.style.display = 'none';
+                welcomeMessage.textContent = `Bem-vindo, ${playerName}!`;
+                startScreen.style.display = 'flex';
+                setTimeout(() => startScreen.style.opacity = '1', 10);
+            }, 500);
+        }
+        
+        function startGame() {
+            // Resetar o jogo
+            playerHealth = 1000;
+            enemyHealth = 5000;
+            score = 0;
+            
+            updateHealthBars();
+            document.getElementById('player-name-display').textContent = playerName;
+            
+            // Esconder tela inicial e mostrar jogo
+            startScreen.style.opacity = '0';
+            setTimeout(() => {
+                startScreen.style.display = 'none';
+                gameScreen.style.display = 'flex';
+                setTimeout(() => gameScreen.style.opacity = '1', 10);
+            }, 500);
+        }
+        
+        function showQuestion(attackType) {
+            let questionObj;
+            let questionSet;
+            
+            switch(attackType) {
+                case "fast":
+                    questionSet = easyQuestions;
+                    break;
+                case "discharge":
+                    questionSet = mediumQuestions;
+                    break;
+                case "thunder":
+                    questionSet = hardQuestions;
+                    break;
+            }
+            
+            // Seleciona uma pergunta aleatória do conjunto
+            questionObj = questionSet[Math.floor(Math.random() * questionSet.length)];
+            
+            // Exibe a pergunta
+            document.getElementById('question-text').textContent = questionObj.question;
+            
+            // Limpa respostas anteriores
+            const answerOptions = document.getElementById('answer-options');
+            answerOptions.innerHTML = '';
+            
+            // Adiciona as opções de resposta
+            questionObj.answers.forEach((answer, index) => {
+                const button = document.createElement('button');
+                button.className = 'answer-button';
+                button.textContent = answer;
+                button.dataset.index = index;
+                button.addEventListener('click', function() {
+                    checkAnswer(parseInt(this.dataset.index), questionObj.correct, attackType);
+                });
+                answerOptions.appendChild(button);
+            });
+            
+            // Mostra a tela de perguntas
+            document.getElementById('question-screen').style.display = 'block';
+        }
+        
+        function checkAnswer(selectedIndex, correctIndex, attackType) {
+            // Esconde a tela de perguntas
+            document.getElementById('question-screen').style.display = 'none';
+            
+            if (selectedIndex === correctIndex) {
+                // Acertou - aplica dano ao inimigo
+                enemyHealth -= currentAttackDamage;
+                
+                // Adiciona pontos
+                let pointsToAdd = 0;
+                switch(attackType) {
+                    case "fast": pointsToAdd = 1000; break;
+                    case "discharge": pointsToAdd = 2500; break;
+                    case "thunder": pointsToAdd = 5000; break;
+                }
+                score += pointsToAdd;
+                
+                // Mostra o ataque
+                showAttackMessage(getAttackName(attackType), 'pikachu');
+                
+                // Verifica se o inimigo foi derrotado
+                if (enemyHealth <= 0) {
+                    enemyHealth = 0;
+                    setTimeout(endGame, 1500, true);
+                }
+            } else {
+                // Errou - sofre ataque do inimigo
+                let enemyAttack, enemyDamage;
+                
+                switch(attackType) {
+                    case "fast":
+                        enemyAttack = "JULGAMENTO!";
+                        enemyDamage = 250;
+                        break;
+                    case "discharge":
+                        enemyAttack = "CANÇÃO DA PERDIÇÃO!";
+                        enemyDamage = 175;
+                        break;
+                    case "thunder":
+                        enemyAttack = "PODER CÓSMICO!";
+                        enemyDamage = 50;
+                        break;
+                }
+                
+                // Subtrai pontos
+                let pointsToSubtract = 0;
+                switch(attackType) {
+                    case "fast": pointsToSubtract = 1000; break;
+                    case "discharge": pointsToSubtract = 2500; break;
+                    case "thunder": pointsToSubtract = 5000; break;
+                }
+                score = Math.max(0, score - pointsToSubtract);
+                
+                // Aplica dano ao jogador
+                playerHealth -= enemyDamage;
+                
+                // Mostra o ataque do inimigo
+                showAttackMessage(enemyAttack, 'arceus');
+                
+                // Verifica se o jogador foi derrotado
+                if (playerHealth <= 0) {
+                    playerHealth = 0;
+                    setTimeout(endGame, 1500, false);
+                }
+            }
+            
+            updateHealthBars();
+        }
+        
+        function getAttackName(attackType) {
+            switch(attackType) {
+                case "fast": return "ATAQUE RÁPIDO!";
+                case "discharge": return "DESCARGA!";
+                case "thunder": return "CHOQUE DO TROVÃO!";
+                default: return "";
+            }
+        }
+        
+        function showAttackMessage(attackName, attacker) {
+            const attackDisplay = document.getElementById('attack-display');
+            attackDisplay.textContent = attackName;
+            
+            if (attacker === 'pikachu') {
+                attackDisplay.className = 'pikachu-attack';
+            } else {
+                attackDisplay.className = 'arceus-attack';
+            }
+            
+            attackDisplay.style.display = 'block';
+            
+            setTimeout(function() {
+                attackDisplay.style.display = 'none';
+            }, 1000);
+        }
+        
+        function updateHealthBars() {
+            // Atualiza barras de vida
+            document.getElementById('player-health-bar').style.width = `${(playerHealth / 1000) * 100}%`;
+            document.getElementById('enemy-health-bar').style.width = `${(enemyHealth / 5000) * 100}%`;
+            
+            // Atualiza textos de vida
+            document.getElementById('player-health-text').textContent = `${playerHealth}/1000`;
+            document.getElementById('enemy-health-text').textContent = `${enemyHealth}/5000`;
+            
+            // Muda cor da barra conforme a vida diminui
+            if (playerHealth < 300) {
+                document.getElementById('player-health-bar').style.backgroundColor = '#f44336';
+            } else if (playerHealth < 600) {
+                document.getElementById('player-health-bar').style.backgroundColor = '#ff9800';
+            } else {
+                document.getElementById('player-health-bar').style.backgroundColor = '#4CAF50';
+            }
+            
+            if (enemyHealth < 1500) {
+                document.getElementById('enemy-health-bar').style.backgroundColor = '#f44336';
+            } else if (enemyHealth < 3000) {
+                document.getElementById('enemy-health-bar').style.backgroundColor = '#ff9800';
+            } else {
+                document.getElementById('enemy-health-bar').style.backgroundColor = '#4CAF50';
+            }
+        }
+        
+        function endGame(playerWon) {
+            const gameOverText = document.getElementById('game-over-text');
+            const finalScore = document.getElementById('final-score');
+            
+            if (playerWon) {
+                gameOverText.textContent = "Você capturou o Arceus!";
+            } else {
+                gameOverText.textContent = "O deus Arceus te explodiu :D";
+            }
+            
+            finalScore.textContent = `Pontuação Final: ${score}`;
+            
+            // Salva a pontuação e carrega o placar
+            saveHighScore(playerName, score);
+            loadHighScores();
+            
+            // Mostra tela de fim de jogo
+            gameScreen.style.opacity = '0';
+            setTimeout(() => {
+                gameScreen.style.display = 'none';
+                gameOverScreen.style.display = 'flex';
+                setTimeout(() => gameOverScreen.style.opacity = '1', 10);
+            }, 500);
+        }
+        
+        function restartGame() {
+            // Volta para a tela inicial
+            gameOverScreen.style.opacity = '0';
+            setTimeout(() => {
+                gameOverScreen.style.display = 'none';
+                startScreen.style.display = 'flex';
+                setTimeout(() => startScreen.style.opacity = '1', 10);
+            }, 500);
+        }
+        
+        // Funções para manipulação do placar
+        function saveHighScore(name, score) {
+            let highScores = JSON.parse(localStorage.getItem('pokemonHighScores')) || [];
+            
+            highScores.push({ name, score });
+            
+            // Ordena por pontuação (maior primeiro)
+            highScores.sort((a, b) => b.score - a.score);
+            
+            // Mantém apenas as 5 melhores
+            highScores = highScores.slice(0, 5);
+            
+            localStorage.setItem('pokemonHighScores', JSON.stringify(highScores));
+        }
+        
+        function loadHighScores() {
+            const highScores = JSON.parse(localStorage.getItem('pokemonHighScores')) || [];
+            const highScoresList = document.getElementById('high-scores-list');
+            
+            highScoresList.innerHTML = '';
+            
+            if (highScores.length === 0) {
+                highScoresList.innerHTML = '<li>Nenhuma pontuação ainda</li>';
+            } else {
+                highScores.forEach((score, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${index + 1}. ${score.name}: ${score.score}`;
+                    highScoresList.appendChild(li);
+                });
+            }
+        }
+        
+        function clearHighScores() {
+            localStorage.removeItem('pokemonHighScores');
+            loadHighScores();
+        }
+    </script>
+</body>
+</html>
