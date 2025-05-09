@@ -434,6 +434,25 @@
             background-color: #f0c000;
             transform: scale(1.05);
         }
+         #rate-us-button {
+            padding: 10px 20px;
+            margin: 8px;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        #rate-us-button:hover {
+            background-color: #e64a19;
+            transform: scale(1.05);
+        }
 
         /* Adicionando feedback de toque para botões */
         button {
@@ -590,11 +609,13 @@
                 <ul id="high-scores-list"></ul>
             </div>
             
-            <button id="restart-button" class="game-over-button">Jogar Novamente</button>
+            <button id="restart-button" class="game-over-button"> Jogar Novamente</button>
             <button id="clear-scores-button" class="game-over-button">Limpar Placar</button>
+            <button id="rate-us-button" onclick="window.location.href = 'https://docs.google.com/forms/d/1RSSfV0w-Wc32LJSlRoVKiY6OCXvWRtWoSgLBK3-98E0/edit#responses'">AVALIE-NOS!</button>
         </div>
     </div>
 
+   
     <script>
         // Variáveis do jogo
         let playerHealth = 1000;
@@ -839,6 +860,8 @@
             
             // Evento do botão de limpar placar
             document.getElementById('clear-scores-button').addEventListener('click', clearHighScores);
+
+            
             
             // Carrega o placar
             loadHighScores();
@@ -1050,7 +1073,7 @@
             if (playerWon) {
                 gameOverText.textContent = "Você capturou o Arceus!";
             } else {
-                gameOverText.textContent = "O deus Arceus te explodiu :D";
+                gameOverText.textContent = "O Arceus te explodiu :D";
             }
             
             finalScore.textContent = `Pontuação Final: ${score}`;
