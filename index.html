@@ -642,7 +642,7 @@
             background-color: #f0c000;
             transform: scale(1.05);
         }
-         #rate-us-button {
+         #rate-us-button, #rate-us-start-button {
             padding: 10px 20px;
             margin: 8px;
             background-color: #ff5722;
@@ -657,7 +657,7 @@
             max-width: 200px;
         }
 
-        #rate-us-button:hover {
+        #rate-us-button:hover, #rate-us-start-button:hover {
             background-color: #e64a19;
             transform: scale(1.05);
         }
@@ -763,6 +763,7 @@
         <div id="start-content">
             <div id="welcome-message"></div>
             <button id="start-button">Iniciar Batalha</button>
+            <button id="rate-us-start-button" class="game-over-button" onclick="window.location.href = 'https://docs.google.com/forms/d/1RSSfV0w-Wc32LJSlRoVKiY6OCXvWRtWoSgLBK3-98E0/edit#responses'">AVALIE-NOS!</button>
         </div>
     </div>
 
@@ -817,7 +818,7 @@
                 <ul id="high-scores-list"></ul>
             </div>
             
-            <button id="restart-button" class="game-over-button"> Jogar Novamente</button>
+            <button id="back-to-start-button" class="game-over-button">Voltar ao Início</button>
             <button id="clear-scores-button" class="game-over-button">Limpar Placar</button>
             <button id="rate-us-button" onclick="window.location.href = 'https://docs.google.com/forms/d/1RSSfV0w-Wc32LJSlRoVKiY6OCXvWRtWoSgLBK3-98E0/edit#responses'">AVALIE-NOS!</button>
         </div>
@@ -1133,8 +1134,8 @@ function createCosmicSphere() {
                 });
             });
             
-            // Evento do botão de reiniciar
-            document.getElementById('restart-button').addEventListener('click', restartGame);
+            // Evento do botão de voltar ao início
+            document.getElementById('back-to-start-button').addEventListener('click', backToStart);
             
             // Evento do botão de limpar placar
             document.getElementById('clear-scores-button').addEventListener('click', clearHighScores);
@@ -1371,7 +1372,7 @@ function createCosmicSphere() {
             }, 500);
         }
         
-        function restartGame() {
+        function backToStart() {
             // Volta para a tela inicial
             gameOverScreen.style.opacity = '0';
             setTimeout(() => {
